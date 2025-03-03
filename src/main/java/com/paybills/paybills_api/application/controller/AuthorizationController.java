@@ -47,7 +47,7 @@ public class AuthorizationController {
         User newUser = User.builder()
                 .email(requestDTO.email())
                 .password(encryptedPassword)
-                .role(requestDTO.role())
+                .role(UserRole.USER)
                 .build();
 
         repository.save(newUser);
