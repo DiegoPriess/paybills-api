@@ -5,6 +5,7 @@ import com.paybills.paybills_api.application.dto.user.AuthenticationResponseDTO;
 import com.paybills.paybills_api.application.dto.user.RegisterRequestDTO;
 import com.paybills.paybills_api.coredomain.model.User;
 import com.paybills.paybills_api.coredomain.service.AuthorizationService;
+import com.paybills.paybills_api.infrastructure.enums.user.UserRole;
 import com.paybills.paybills_api.infrastructure.repository.user.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class AuthorizationController {
     private final UserRepository repository;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponseDTO> login(@RequestBody @Valid AuthenticationRequestDTO requestDTO) {
+    public ResponseEntity<AuthenticationResponseDTO> login(@Valid @RequestBody AuthenticationRequestDTO requestDTO) {
         UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(requestDTO.email(), requestDTO.password());
         Authentication auth = this.manager.authenticate(usernamePassword);
         String token = service.generateToken((User) auth.getPrincipal());
@@ -40,7 +41,7 @@ public class AuthorizationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequestDTO requestDTO) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO requestDTO) {
         if (this.repository.findByEmail(requestDTO.email()) != null) return ResponseEntity.badRequest().build();
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(requestDTO.password());
