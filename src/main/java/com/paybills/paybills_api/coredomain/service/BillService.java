@@ -1,5 +1,7 @@
 package com.paybills.paybills_api.coredomain.service;
 
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import com.paybills.paybills_api.application.dto.bill.BillCreateRequestDTO;
 import com.paybills.paybills_api.application.dto.bill.BillUpdateRequestDTO;
 import com.paybills.paybills_api.coredomain.model.Bill;
@@ -9,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -81,6 +86,25 @@ public class BillService {
 
         String userId = authorizationService.getCurrentUser().getId();
         return repository.getTotalPaidBetweenDates(startDate, endDate, userId);
+    }
+
+    public void importBills(MultipartFile file) {
+        try (CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
+            String[] values;
+            csvReader.readNext();
+            while ((values = csvReader.readNext()) != null) {
+                Bill bill = Bill.builder()
+                        .dueDate(LocalDate.parse(values[0]))
+                        .amount(new BigDecimal(values[1]))
+                        .description(values[2])
+                        .status(BillStatus.valueOf(values[3].toUpperCase()))
+                        .user(authorizationService.getCurrentUser())
+                        .build();
+                repository.save(bill);
+            }
+        } catch (IOException | CsvValidationException e) {
+            throw new RuntimeException("Erro ao processar o arquivo CSV", e);
+        }
     }
 
     private void validateStatusChange(BillStatus status, LocalDate paymentDate) {

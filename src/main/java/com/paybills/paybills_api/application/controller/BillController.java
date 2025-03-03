@@ -12,8 +12,10 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -83,5 +85,16 @@ public class BillController {
     public ResponseEntity<BigDecimal> getTotalPaid(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
         BigDecimal totalPaid = service.getTotalPaid(startDate, endDate);
         return ResponseEntity.ok(totalPaid);
+    }
+
+    @Operation(summary = "Importar Contas via CSV", description = "Importa contas a pagar a partir de um arquivo CSV")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Importação realizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro ao processar o arquivo")
+    })
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> importBills(@RequestParam("file") MultipartFile file) {
+        service.importBills(file);
+        return ResponseEntity.ok("Importação realizada com sucesso!");
     }
 }
