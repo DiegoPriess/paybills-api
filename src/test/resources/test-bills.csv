@@ -1,0 +1,5 @@
+dueDate,amount,description,status
+2025-03-10,150.00,Conta de Luz,PENDING
+2025-03-15,200.50,Fatura do Cartão,PAID
+2025-03-20,75.90,Assinatura de Streaming,PENDING
+2025-03-25,320.00,Aluguel,PAID
