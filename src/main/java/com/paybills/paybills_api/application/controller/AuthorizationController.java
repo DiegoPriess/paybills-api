@@ -6,7 +6,7 @@ import com.paybills.paybills_api.application.dto.user.RegisterRequestDTO;
 import com.paybills.paybills_api.infrastructure.enums.user.UserRole;
 import com.paybills.paybills_api.coredomain.model.User;
 import com.paybills.paybills_api.coredomain.service.AuthorizationService;
-import com.paybills.paybills_api.infrastructure.repository.user.UserRepository;
+import com.paybills.paybills_api.infrastructure.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

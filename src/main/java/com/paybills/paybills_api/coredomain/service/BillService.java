@@ -6,7 +6,7 @@ import com.paybills.paybills_api.application.dto.bill.BillCreateRequestDTO;
 import com.paybills.paybills_api.application.dto.bill.BillUpdateRequestDTO;
 import com.paybills.paybills_api.coredomain.model.Bill;
 import com.paybills.paybills_api.infrastructure.enums.bill.BillStatus;
-import com.paybills.paybills_api.infrastructure.repository.user.BillRepository;
+import com.paybills.paybills_api.infrastructure.repository.BillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

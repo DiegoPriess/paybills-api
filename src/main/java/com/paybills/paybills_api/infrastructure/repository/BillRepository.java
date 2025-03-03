@@ -1,4 +1,4 @@
-package com.paybills.paybills_api.infrastructure.repository.user;
+package com.paybills.paybills_api.infrastructure.repository;
 
 import com.paybills.paybills_api.coredomain.model.Bill;
 import org.springframework.data.domain.Page;

@@ -1,7 +1,7 @@
 package com.paybills.paybills_api.infrastructure.security;
 
 import com.paybills.paybills_api.coredomain.service.AuthorizationService;
-import com.paybills.paybills_api.infrastructure.repository.user.UserRepository;
+import com.paybills.paybills_api.infrastructure.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

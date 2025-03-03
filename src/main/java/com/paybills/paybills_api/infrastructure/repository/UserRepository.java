@@ -1,4 +1,4 @@
-package com.paybills.paybills_api.infrastructure.repository.user;
+package com.paybills.paybills_api.infrastructure.repository;
 
 import com.paybills.paybills_api.coredomain.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
