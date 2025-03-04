@@ -58,3 +58,4 @@ A API utiliza JWT para autenticação e controle de acesso aos endpoints protegi
 ## Para testar o endpoint de Importação de contas por CSV baixe o arquivo
 
 [📂 Baixar Arquivo CSV](https://github.com/DiegoPriess/paybills-api/raw/master/src/test/resources/test-bills.csv)
+💡 *Clique com o botão direito no link e selecione "Salvar link como..." para baixar o arquivo.*
