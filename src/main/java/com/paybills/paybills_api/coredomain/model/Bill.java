@@ -40,4 +40,17 @@ public class Bill {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public void validateForPersist() {
+        if (this.amount.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalArgumentException("O valor da conta deve ser maior que zero");
+        if (this.dueDate == null) throw new IllegalArgumentException("A data de vencimento é obrigatória!");
+        if (this.description == null || this.description.isEmpty()) throw new IllegalArgumentException("A descrição é obrigatória!");
+        if (this.status == null) throw new IllegalArgumentException("O status é obrigatório!");
+    }
+
+    public void validateStatusChange(BillStatus newStatus, LocalDate paymentDate) {
+        if (newStatus == BillStatus.PAID && paymentDate == null) throw new IllegalArgumentException("É necessário informar a data de pagamento para uma conta paga");
+        if (newStatus == BillStatus.PENDING && paymentDate != null) throw new IllegalArgumentException("Não é possível informar uma data de pagamento para uma conta pendente");
+    }
+
 }

@@ -86,9 +86,8 @@ class BillServiceTest {
                 "Updated Bill"
         );
 
-        lenient().when(authorizationService.getCurrentUser()).thenReturn(mockUser);
-
-        when(billRepository.findById("1")).thenReturn(Optional.of(bill));
+        when(authorizationService.getCurrentUser()).thenReturn(mockUser);
+        when(billRepository.findByIdAndUser(any(), any())).thenReturn(Optional.of(bill));
         when(billRepository.save(any(Bill.class))).thenReturn(bill);
 
         Bill updatedBill = billService.update("1", request);
@@ -96,13 +95,17 @@ class BillServiceTest {
         assertNotNull(updatedBill);
         assertEquals(request.amount(), updatedBill.getAmount());
         assertEquals(request.description(), updatedBill.getDescription());
+        assertEquals(request.dueDate(), updatedBill.getDueDate());
+        assertEquals(request.paymentDate(), updatedBill.getPaymentDate());
 
-        verify(billRepository, times(1)).save(any(Bill.class));
+        verify(billRepository, times(1)).save(bill);
     }
 
     @Test
     void shouldUpdateBillStatusSuccessfully() {
-        when(billRepository.findById("1")).thenReturn(Optional.of(bill));
+        when(authorizationService.getCurrentUser()).thenReturn(mockUser);
+        when(billRepository.findByIdAndUser(any(), any())).thenReturn(Optional.of(bill));
+        when(billRepository.save(any(Bill.class))).thenReturn(bill);
 
         billService.updateStatus("1", BillStatus.PAID, LocalDate.now());
 

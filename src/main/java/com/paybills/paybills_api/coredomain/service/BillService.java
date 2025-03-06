@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Service
 public class BillService {
@@ -39,34 +38,27 @@ public class BillService {
                 .status(billCreateRequestDTO.status())
                 .user(authorizationService.getCurrentUser())
                 .build();
+        bill.validateForPersist();
         return repository.save(bill);
     }
 
     public Bill update(String id, BillUpdateRequestDTO billUpdateRequestDTO) {
-        Optional<Bill> existingBill = repository.findById(id);
-        if (existingBill.isEmpty()) throw new RuntimeException("Conta não encontrada");
+        Bill updatedBill = getBillById(id);
 
-        Bill updatedBill = existingBill.get();
         updatedBill.setDueDate(billUpdateRequestDTO.dueDate());
         updatedBill.setPaymentDate(billUpdateRequestDTO.paymentDate());
         updatedBill.setAmount(billUpdateRequestDTO.amount());
         updatedBill.setDescription(billUpdateRequestDTO.description());
 
+        updatedBill.validateForPersist();
         return repository.save(updatedBill);
     }
 
     public void updateStatus(String id, BillStatus status, LocalDate paymentDate) {
-        Bill bill = repository.findById(id).orElseThrow(() -> new RuntimeException("Conta não encontrada"));
-
-        validateStatusChange(status, paymentDate);
-
-        if (status == BillStatus.PENDING) {
-            bill.setPaymentDate(null);
-        } else if (status == BillStatus.PAID) {
-            bill.setPaymentDate(paymentDate);
-        }
-
+        Bill bill = getBillById(id);
+        bill.validateStatusChange(status, paymentDate);
         bill.setStatus(status);
+        bill.setPaymentDate(paymentDate);
         repository.save(bill);
     }
 
@@ -76,13 +68,11 @@ public class BillService {
     }
 
     public Bill getById(String id) {
-        String userId = authorizationService.getCurrentUser().getId();
-        return repository.findByIdAndUser(id, userId)
-                .orElseThrow(() -> new RuntimeException("Conta não encontrada ou não pertence ao usuário"));
+        return getBillById(id);
     }
 
     public BigDecimal getTotalPaid(LocalDate startDate, LocalDate endDate) {
-        validateStartDateBeforeEndDate(startDate, endDate);
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) throw new IllegalArgumentException("A data de início não pode ser maior que a data de término");
 
         String userId = authorizationService.getCurrentUser().getId();
         return repository.getTotalPaidBetweenDates(startDate, endDate, userId);
@@ -100,6 +90,7 @@ public class BillService {
                         .status(BillStatus.valueOf(values[3].toUpperCase()))
                         .user(authorizationService.getCurrentUser())
                         .build();
+                bill.validateForPersist();
                 repository.save(bill);
             }
         } catch (IOException | CsvValidationException e) {
@@ -107,19 +98,9 @@ public class BillService {
         }
     }
 
-    private void validateStatusChange(BillStatus status, LocalDate paymentDate) {
-        if (status == BillStatus.PAID && paymentDate == null) {
-            throw new RuntimeException("Ao pagar uma conta, é obrigatório informar a data de pagamento");
-        }
-
-        if (status == BillStatus.PENDING && paymentDate != null) {
-            throw new RuntimeException("Não é possível informar uma data de pagamento para uma conta pendente");
-        }
-    }
-
-    private void validateStartDateBeforeEndDate(LocalDate startDate, LocalDate endDate) {
-        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
-            throw new RuntimeException("A data de início não pode ser maior que a data de término");
-        }
+    private Bill getBillById(String id) {
+        String userId = authorizationService.getCurrentUser().getId();
+        return repository.findByIdAndUser(id, userId)
+                         .orElseThrow(() -> new RuntimeException("Conta não encontrada ou não pertence ao usuário"));
     }
 }
